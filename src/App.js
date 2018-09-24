@@ -11,7 +11,7 @@ class Square extends Component {
   }
 
   handleClick() {
-    console.log("handler in Square");
+    // TODO: ignore click if square is open
     this.setState({isClicked: true});
     this.props.onClick();
   }
@@ -40,15 +40,39 @@ function CurrentSquare(props) {
 class Board extends Component {
   constructor(props) {
     super(props);
+
+    /*for (var ra=[],i=0;i<40;++i) ra[i]=i;
+    ra = shuffle(ra);
+    */
+    // shuffle(dimension,no. of bomb)
+    //var ra = initFieldmap(8*8,10);
+
+
     this.state = {
+      dim: props.dim,
       currSquare: undefined,
+      fieldmap: initFieldmap(8*8,10),
     };
+  console.log(this.state.fieldmap);
   }
 
-  handleClick(c,r) {
-    console.log("square("+c+","+r+")");
-    this.setState({currSquare: [c,r]});
 
+  handleClick(c,r) {
+    const fieldmap = this.state.fieldmap;
+    this.setState({currSquare: [c,r]});
+    if (this.state.fieldmap[this.getFieldIdx(c,r)] === 9) {
+      console.log("you clicked on a bomb!");
+    }
+
+    var idx=this.getFieldIdx(0,-1);
+    console.log("idx: "+idx+"val: "+fieldmap[idx]);
+  }
+
+  getFieldIdx(c,r) {
+    console.log("square: "+c+","+r);
+    var idx=r*this.state.dim+c;
+    console.log("dim: "+this.state.dim+" idx: "+idx);
+    return idx;
   }
 
   renderCol(r,dim) {
@@ -85,17 +109,40 @@ class Board extends Component {
   render() {
     const currSq = this.state.currSquare;
 
+
     return (
       <div>
       Board here
       <br/>
       <CurrentSquare coord={currSq} />
-      {this.renderRow(10)}
+      {this.renderRow(8)}
       </div>
     );
 
   }
 
+}
+
+function initFieldmap(dim,nbomb) {
+  for (var array=[], i=0; i<dim; ++i) {
+    array[i] = i;
+  }
+  for (var fieldmap=[],k=0;k<dim;++k) fieldmap[k]=0;
+
+  var tmp, current, top = array.length;
+  if(top) while(--top) {
+      current = Math.floor(Math.random() * (top + 1));
+      tmp = array[current];
+      array[current] = array[top];
+      array[top] = tmp;
+  }
+
+  for (var j=0;j<nbomb;++j) {
+    var el = array[j];
+    fieldmap[el] = 9;
+  }
+
+  return fieldmap;
 }
 
 class App extends Component {
@@ -110,7 +157,7 @@ class App extends Component {
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
         <div>
-          <Board/>
+          <Board dim="8"/>
         </div>
       </div>
     );
