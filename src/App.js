@@ -51,10 +51,10 @@ class Board extends Component {
     this.state = {
       dim: dim,
       nbomb: nbomb,
-      currSquare: undefined,
       fieldmap: initFieldmap(size,nbomb),
       clickmap: Array(size),
       exploded: false,
+      win: false,
     };
 
   }
@@ -65,36 +65,32 @@ class Board extends Component {
     var nbomb = 0;
     const fieldmap = this.state.fieldmap;
 
-    // TODO: return 9 for bomb square
     if (fieldmap[this.getFieldIdx(c,r)] === 9) {
       return 9;
     }
     for (var x=c-1;x<c+2;++x) {
       for (var y=r-1;y<r+2;++y) {
         var i = this.getFieldIdx(x,y);
-        if (fieldmap[i] === 9) ++nbomb;
+        if (fieldmap[i] === 9) {
+          ++nbomb;
+        }
       }
     }
     return nbomb;
   }
-
 
   handleClick(c,r) {
     const idx = this.getFieldIdx(c,r);
     const clickmap = this.state.clickmap;
     // do nothing if
     // 1. out of bound
-    // 2. button(c,r).isClicked
-    // 3. a mines has exploded
+    // 2. button is already clicked
+    // 3. a mine has exploded
     // 4. win
-    if  (idx<0 || clickmap[idx] || this.state.exploded )
+    if  (idx<0 || clickmap[idx] || this.state.exploded || this.state.win )
       return;
 
     const fieldmap = this.state.fieldmap;
-
-    this.setState({
-      currSquare: [c,r],
-    });
 
     // if clicked on 9-square (a bomb)
     if (fieldmap[idx] === 9) {
@@ -116,6 +112,7 @@ class Board extends Component {
       const nbomb = this.countBomb(c,r);
       fieldmap[idx] = nbomb;
 
+      // update these states before recursing on neighbours
       this.setState({
           fieldmap: fieldmap,
           clickmap: clickmap,
@@ -127,6 +124,12 @@ class Board extends Component {
         this.handleClick(c1,r1); this.handleClick(c,r1 );  this.handleClick(c2,r1);
         this.handleClick(c1,r ); /*this.handleClick(c,r)*/ this.handleClick(c2,r );
         this.handleClick(c1,r2); this.handleClick(c,r2 );  this.handleClick(c2,r2);
+      }
+
+      // set state.win = true if all squares are clicked before explosion
+      const nclick = countClickmap(this.state.clickmap)
+      if (nclick === clickmap.length - this.state.nbomb) {
+        this.setState({win: true});
       }
     }
   }
@@ -140,7 +143,7 @@ class Board extends Component {
     return (r*this.state.dim+c);
   }
 
-  // return [col,row] from quare[idx]
+  // return [col,row] from square[idx]
   getFieldCR(idx) {
     const dim = this.state.dim;
     var c = idx % dim;
@@ -194,16 +197,13 @@ class Board extends Component {
   }
 
   render() {
-    const currSq = this.state.currSquare;
 
     var msg = "Playing...";
 
     if (this.state.exploded) {
       msg = "You lost!";
     } else {
-      const clickmap = this.state.clickmap;
-      const nclick = countClickmap(clickmap)
-      if (nclick === clickmap.length - this.state.nbomb) {
+      if (this.state.win) {
         msg = "You won!";
       }
     }
@@ -212,7 +212,7 @@ class Board extends Component {
     return (
       <div>
       <br/>
-      <MsgBoard msg={msg} coord={currSq} />
+      <MsgBoard msg={msg} />
       {this.renderBoard(this.state.dim)}
       </div>
     );
