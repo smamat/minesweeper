@@ -2,47 +2,92 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-class Square extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isClicked: false,
-    };
-  }
+function Square(props) {
+    var className = "square ";
 
-  handleClick() {
-    // TODO: ignore click if square is open
-    //this.setState({isClicked: true});
-    if (!this.state.isClicked) {
-      this.props.onClick();
+    /*if (props.label === "") {
+      className += "closed ";
+    } else {
+      className += "open ";
+      console.log("open: "+props.label);
     }
-  }
 
-  render () {
-    const isClicked = this.props.isClicked;
-
-    const className = isClicked ? "open square" : "closed square";
+    if (props.label === 9) {
+      className += "bomb ";
+    }*/
+    switch(props.label) {
+      case 0:
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+        className += "open ";
+        break;
+      case 9:
+        className += "open bomb ";
+        break;
+      default:
+        className += "closed ";
+    }
 
     return (
-      <button
-      className={className}
-      onClick={() => this.handleClick()}>
-      {this.props.label}
+      <button className={className} onClick={props.onClick}>
+      {props.label}
       </button>
     );
-  }
 }
 
 function MsgBoard(props) {
   return <b>{props.msg}</b>
-  //if (props.coord) {
-      //return <b>({props.coord[0]},{props.coord[1]})</b>;
-  //}
-  //return <b>(X,X)</b>;
-
 }
 
 class Board extends Component {
+
+  renderCol(r,dim) {
+    // poor: making a list of integer so .map() can traverse
+    var colIdx = [];
+    for (var i=0; i < dim; i++) colIdx.push(i);
+
+    const fieldmap = this.props.fieldmap;
+    const clickmap = this.props.clickmap;
+
+    const col = colIdx.map((sq,c) => {
+      const idx = r*dim+c;
+      const isClicked = clickmap[idx];
+      return (
+        <Square key={sq}
+        onClick={() => {this.props.onClick(c,r)}}
+        label={isClicked ? fieldmap[idx] : ""}
+        />);
+    });
+
+    return col;
+  }
+
+  render() {
+    const dim = this.props.dim;
+
+    var rowIdx = [];
+    for (var i=0; i < dim; i++ ) rowIdx.push(i);
+
+    // render a row
+    const row = rowIdx.map((item,i) => {
+      return (
+        <div align="centre" className="board-row" key={item}>
+          {this.renderCol(i,dim)}
+        </div>
+      );
+    });
+
+    return row;
+  }
+}
+
+class Game extends Component {
   constructor(props) {
     super(props);
     const dim = props.dim;
@@ -61,21 +106,21 @@ class Board extends Component {
 
   // count no. of bombs around a square
   countBomb(c,r) {
-    // Note: ok to iterate over square(c,r) bc we know it's not a bomb
     var nbomb = 0;
     const fieldmap = this.state.fieldmap;
 
     if (fieldmap[this.getFieldIdx(c,r)] === 9) {
       return 9;
     }
-    for (var x=c-1;x<c+2;++x) {
-      for (var y=r-1;y<r+2;++y) {
+
+    // ok to iterate over square(c,r) bc now we know it's not a bomb
+    for (var x=c-1; x < c+2; ++x) {
+      for (var y=r-1; y < r+2; ++y) {
         var i = this.getFieldIdx(x,y);
-        if (fieldmap[i] === 9) {
-          ++nbomb;
-        }
+        if (fieldmap[i] === 9) ++nbomb;
       }
     }
+
     return nbomb;
   }
 
@@ -85,22 +130,20 @@ class Board extends Component {
     // do nothing if
     // 1. out of bound
     // 2. button is already clicked
-    // 3. a mine has exploded
+    // 3. a mine has been clicked (exploded)
     // 4. win
-    if  (idx<0 || clickmap[idx] || this.state.exploded || this.state.win )
+    if  (idx < 0 || clickmap[idx] || this.state.exploded || this.state.win )
       return;
 
     const fieldmap = this.state.fieldmap;
 
     // if clicked on 9-square (a bomb)
     if (fieldmap[idx] === 9) {
-      console.log("you clicked on a bomb!");
       // open all 9-squares (bomb squares)
       this.setState({
         clickmap: fieldmap.map((v,i) => {
           return (v===9) ? true : clickmap[i]; }),
         exploded: true,
-        ends: true,
       });
     } else {
     // if clicked on x-square
@@ -143,59 +186,6 @@ class Board extends Component {
     return (r*this.state.dim+c);
   }
 
-  // return [col,row] from square[idx]
-  getFieldCR(idx) {
-    const dim = this.state.dim;
-    var c = idx % dim;
-    var r = (idx - c) / dim;
-
-    return [c,r];
-  }
-
-  renderCol(r,dim) {
-    // poor: making a list of integer so .map() can traverse
-    var colIdx = [];
-    for (var i=0; i < dim; i++){
-      colIdx.push(i);
-    }
-
-    const fieldmap = this.state.fieldmap;
-    const clickmap = this.state.clickmap;
-
-    const col = colIdx.map((sq,c) => {
-      const idx = this.getFieldIdx(c,r);
-      const isClicked = clickmap[idx];
-      return (
-        <Square
-        key={sq}
-        col={c} row={r}
-        onClick={()=>{this.handleClick(c,r)}}
-        isClicked={isClicked}
-        label={isClicked ? fieldmap[idx] : ""}
-        />);
-    });
-
-    return col;
-  }
-
-  renderBoard(dim) {
-    var rowIdx = [];
-    for (var i=0; i<dim; i++ ) {
-      rowIdx.push(i);
-    }
-
-    // render a row
-    const row = rowIdx.map((row,i) => {
-      return (
-        <div align="centre"className="board-row" key={row}>
-          {this.renderCol(i,dim)}
-        </div>
-      );
-    });
-
-    return row;
-  }
-
   render() {
 
     var msg = "Playing...";
@@ -208,46 +198,44 @@ class Board extends Component {
       }
     }
 
-
     return (
       <div>
       <br/>
       <MsgBoard msg={msg} />
-      {this.renderBoard(this.state.dim)}
+      <Board
+        dim={this.state.dim}
+        fieldmap={this.state.fieldmap}
+        clickmap={this.state.clickmap}
+        onClick={(c,r) => this.handleClick(c,r)}
+        />
       </div>
     );
-
   }
 
-}
+} // end class Game
 
 function countClickmap(clickmap) {
-
   var count = 0;
 
-  for (var i=0; i<clickmap.length; ++i) {
-      if (clickmap[i]) {
-        count++;
-      }
-    }
+  for (var i=0; i < clickmap.length; ++i) {
+    if (clickmap[i]) count++;
+  }
 
-    console.log("count: ",count);
-    return count;
-
+  return count;
 }
-  //count click
-
-
 
 function initFieldmap(size,nbomb) {
   // size = dim*dim
   // set upp arrays
-  for (var array=[], i=0; i<size; ++i) array[i] = i;
-  for (var fieldmap=[],k=0;k<size;++k) fieldmap[k]=0;
+
+  for (var i=0, array=[], fieldmap=[]; i < size; ++i) {
+    array[i] = i;
+    fieldmap[i] = 0;
+  }
 
   // randomise bombs
   var tmp, current, top = array.length;
-  if(top) while(--top) {
+  if (top) while(--top) {
       current = Math.floor(Math.random() * (top + 1));
       tmp = array[current];
       array[current] = array[top];
@@ -255,7 +243,7 @@ function initFieldmap(size,nbomb) {
   }
 
   // plant bombs
-  for (var j=0;j<nbomb;++j) {
+  for (var j=0; j < nbomb;++j) {
     var el = array[j];
     fieldmap[el] = 9;
   }
@@ -275,7 +263,7 @@ class App extends Component {
           Welcome to Minesweeper
         </p>
         <div>
-          <Board dim="8" bomb="10"/>
+          <Game dim="8" bomb="10"/>
         </div>
       </div>
     );

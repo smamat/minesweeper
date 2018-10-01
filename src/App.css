@@ -53,6 +53,11 @@
   width: 34px;
 }
 
+/* no halo effect after button is pressed */
+.square:focus {
+  outline: 0;
+}
+
 .open {
   opacity: 0.7;
   cursor: not-allowed;
@@ -61,4 +66,8 @@
 
 .closed {
   opacity: 0.9;
+}
+
+.bomb {
+  background: #f00;
 }
