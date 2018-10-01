@@ -5,16 +5,6 @@ import './App.css';
 function Square(props) {
     var className = "square ";
 
-    /*if (props.label === "") {
-      className += "closed ";
-    } else {
-      className += "open ";
-      console.log("open: "+props.label);
-    }
-
-    if (props.label === 9) {
-      className += "bomb ";
-    }*/
     switch(props.label) {
       case 0:
       case 1:
@@ -42,7 +32,72 @@ function Square(props) {
 }
 
 function MsgBoard(props) {
-  return <b>{props.msg}</b>
+  return (
+    <div>
+      <b>{props.msg}</b>
+      <Clock />
+    </div>
+  );
+}
+
+class Clock extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      init: new Date(),
+      timer: 0,
+    };
+
+    this.startTimer = this.startTimer.bind(this);
+    this.stopTimer = this.stopTimer.bind(this);
+  }
+
+  /*componentDidMount() {
+    this.timerID = setInterval(
+      () => this.tick(),
+      1000
+    );
+  }*/
+
+  /*componentWillUnmount() {
+    clearInterval(this.timerID);
+  }*/
+
+  tick() {
+    const t0 = this.state.init.getTime();
+    const t1 = (new Date()).getTime();
+    const t = Math.ceil((t1-t0)/1000);
+
+    this.setState({
+      timer: t,
+    });
+  }
+
+  startTimer() {
+    console.log("start");
+    this.setState({init: new Date()});
+    this.timerID = setInterval(
+      () => this.tick(),
+      1000
+    );
+  }
+
+  stopTimer() {
+    console.log("stop");
+    clearInterval(this.timerID);
+  }
+
+  render() {
+    //return  <i>{this.state.timer}</i>
+    //return <i>Test</i>
+    return (
+      <div>
+      <button onClick={this.startTimer}><b>O</b></button>
+      <button onClick={this.stopTimer}><b>I</b></button>
+      <b>{this.state.timer}</b>
+      </div>
+    );
+  }
 }
 
 class Board extends Component {
@@ -188,13 +243,13 @@ class Game extends Component {
 
   render() {
 
-    var msg = "Playing...";
+    var msg = "PLAY";
 
     if (this.state.exploded) {
-      msg = "You lost!";
+      msg = "LOST";
     } else {
       if (this.state.win) {
-        msg = "You won!";
+        msg = "WON";
       }
     }
 
@@ -226,7 +281,7 @@ function countClickmap(clickmap) {
 
 function initFieldmap(size,nbomb) {
   // size = dim*dim
-  // set upp arrays
+  // set up arrays
 
   for (var i=0, array=[], fieldmap=[]; i < size; ++i) {
     array[i] = i;
@@ -263,7 +318,7 @@ class App extends Component {
           Welcome to Minesweeper
         </p>
         <div>
-          <Game dim="8" bomb="10"/>
+          <Game dim="9" bomb="10"/>
         </div>
       </div>
     );
