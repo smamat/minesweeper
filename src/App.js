@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Timer from './Timer'
 
 function Square(props) {
     var className = "square ";
@@ -35,7 +36,6 @@ function MsgBoard(props) {
   return (
     <div>
       <b>{props.msg}</b>
-      <Clock />
     </div>
   );
 }
@@ -66,7 +66,7 @@ class Clock extends Component {
   tick() {
     const t0 = this.state.init.getTime();
     const t1 = (new Date()).getTime();
-    const t = Math.ceil((t1-t0)/1000);
+    const t = Math.ceil((t1-t0)/900);
 
     this.setState({
       timer: t,
@@ -155,8 +155,30 @@ class Game extends Component {
       clickmap: Array(size),
       exploded: false,
       win: false,
+      ticker0: new Date(),
+      ticker: 0,
     };
 
+    this.restartGame = this.restartGame.bind(this);
+
+  }
+
+  restartGame() {
+    const dim = this.state.dim;
+    const size = dim*dim;
+    const nbomb = this.state.nbomb;
+
+    this.setState({
+      fieldmap: initFieldmap(size,nbomb),
+      clickmap: Array(size),
+      exploded: false,
+      win: false,
+      ticker0: new Date(),
+      ticker: 0,
+      tickerOn: false,
+    });
+
+    this.stopTicker();
   }
 
   // count no. of bombs around a square
@@ -187,8 +209,14 @@ class Game extends Component {
     // 2. button is already clicked
     // 3. a mine has been clicked (exploded)
     // 4. win
-    if  (idx < 0 || clickmap[idx] || this.state.exploded || this.state.win )
+    if  (idx < 0 || clickmap[idx] || this.state.exploded || this.state.win ) {
       return;
+    }
+
+    // start stopwatch
+    //if (!this.state.tickerOn) this.startTicker();
+    if (countClickmap(clickmap) <1) this.startTicker();
+
 
     const fieldmap = this.state.fieldmap;
 
@@ -200,6 +228,7 @@ class Game extends Component {
           return (v===9) ? true : clickmap[i]; }),
         exploded: true,
       });
+      this.stopTicker();
     } else {
     // if clicked on x-square
 
@@ -228,8 +257,67 @@ class Game extends Component {
       const nclick = countClickmap(this.state.clickmap)
       if (nclick === clickmap.length - this.state.nbomb) {
         this.setState({win: true});
+        this.stopTicker();
       }
     }
+  }
+
+  resetTicker() {
+    this.setState({
+      ticker0: new Date(),
+    });
+  }
+
+  startTicker() {
+    this.setState({
+      tickerOn: true,
+      ticker0: new Date(),
+    });
+
+      this.timerID = setInterval(
+        () => this.tick(),
+        900
+      );
+  }
+  /*startTicker() {
+    console.log("start ticker");
+    var tickerOn;
+    this.setState((prevState) => {
+      tickerOn = prevState.tickerOn;
+      if (!tickerOn) {
+        return ({
+          tickerOn: true,
+          ticker0: new Date(),
+        });
+      }
+    });
+
+    if (!tickerOn) {
+      this.timerID = setInterval(
+        () => this.tick(),
+        900
+        );
+    }
+  }*/
+
+  stopTicker() {
+    //console.log("stop ticker at " + this.state.ticker );
+    clearInterval(this.timerID);
+    this.setState({
+      tickerOn: false,
+    });
+  }
+
+  tick() {
+    const t0 = this.state.ticker0.getTime();
+    const t1 = (new Date()).getTime();
+    const t = Math.ceil((t1-t0)/1000);
+
+    this.setState({
+      ticker: t,
+    });
+
+    console.log("ticker "+t);
   }
 
   // return index of square if col and row within bounds
@@ -256,7 +344,9 @@ class Game extends Component {
     return (
       <div>
       <br/>
-      <MsgBoard msg={msg} />
+      <button>{this.state.ticker}</button>
+      <button onClick={this.restartGame}>R</button>
+      <button><MsgBoard msg={msg} /></button>
       <Board
         dim={this.state.dim}
         fieldmap={this.state.fieldmap}
@@ -317,6 +407,7 @@ class App extends Component {
         <p className="App-intro">
           Welcome to Minesweeper
         </p>
+        <div><Timer /></div>
         <div>
           <Game dim="9" bomb="10"/>
         </div>
