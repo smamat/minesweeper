@@ -32,70 +32,16 @@ function Square(props) {
     );
 }
 
-function MsgBoard(props) {
-  return (
-    <div>
-      <b>{props.msg}</b>
-    </div>
-  );
-}
-
-class Clock extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      init: new Date(),
-      timer: 0,
-    };
-
-    this.startTimer = this.startTimer.bind(this);
-    this.stopTimer = this.stopTimer.bind(this);
-  }
-
-  /*componentDidMount() {
-    this.timerID = setInterval(
-      () => this.tick(),
-      1000
-    );
-  }*/
-
-  /*componentWillUnmount() {
-    clearInterval(this.timerID);
-  }*/
-
-  tick() {
-    const t0 = this.state.init.getTime();
-    const t1 = (new Date()).getTime();
-    const t = Math.ceil((t1-t0)/900);
-
-    this.setState({
-      timer: t,
-    });
-  }
-
-  startTimer() {
-    console.log("start");
-    this.setState({init: new Date()});
-    this.timerID = setInterval(
-      () => this.tick(),
-      1000
-    );
-  }
-
-  stopTimer() {
-    console.log("stop");
-    clearInterval(this.timerID);
-  }
+//function MsgBoard(props) {
+class MsgBoard extends Component {
 
   render() {
-    //return  <i>{this.state.timer}</i>
-    //return <i>Test</i>
     return (
-      <div>
-      <button onClick={this.startTimer}><b>O</b></button>
-      <button onClick={this.stopTimer}><b>I</b></button>
-      <b>{this.state.timer}</b>
-      </div>
+        <button
+          className="msgbutton"
+          onClick={this.props.onClick}>
+          {this.props.msg}
+        </button>
     );
   }
 }
@@ -159,11 +105,11 @@ class Game extends Component {
       ticker: 0,
     };
 
-    this.restartGame = this.restartGame.bind(this);
+    this.resetGame = this.resetGame.bind(this);
 
   }
 
-  restartGame() {
+  resetGame() {
     const dim = this.state.dim;
     const size = dim*dim;
     const nbomb = this.state.nbomb;
@@ -175,7 +121,6 @@ class Game extends Component {
       win: false,
       ticker0: new Date(),
       ticker: 0,
-      tickerOn: false,
     });
 
     this.stopTicker();
@@ -214,8 +159,7 @@ class Game extends Component {
     }
 
     // start stopwatch
-    //if (!this.state.tickerOn) this.startTicker();
-    if (countClickmap(clickmap) <1) this.startTicker();
+    if (countClickmap(clickmap) < 1) this.startTicker();
 
 
     const fieldmap = this.state.fieldmap;
@@ -262,15 +206,8 @@ class Game extends Component {
     }
   }
 
-  resetTicker() {
-    this.setState({
-      ticker0: new Date(),
-    });
-  }
-
   startTicker() {
     this.setState({
-      tickerOn: true,
       ticker0: new Date(),
     });
 
@@ -279,32 +216,11 @@ class Game extends Component {
         900
       );
   }
-  /*startTicker() {
-    console.log("start ticker");
-    var tickerOn;
-    this.setState((prevState) => {
-      tickerOn = prevState.tickerOn;
-      if (!tickerOn) {
-        return ({
-          tickerOn: true,
-          ticker0: new Date(),
-        });
-      }
-    });
-
-    if (!tickerOn) {
-      this.timerID = setInterval(
-        () => this.tick(),
-        900
-        );
-    }
-  }*/
 
   stopTicker() {
     //console.log("stop ticker at " + this.state.ticker );
     clearInterval(this.timerID);
     this.setState({
-      tickerOn: false,
     });
   }
 
@@ -316,8 +232,6 @@ class Game extends Component {
     this.setState({
       ticker: t,
     });
-
-    console.log("ticker "+t);
   }
 
   // return index of square if col and row within bounds
@@ -331,22 +245,27 @@ class Game extends Component {
 
   render() {
 
-    var msg = "PLAY";
+    var msg = ":o";
 
     if (this.state.exploded) {
-      msg = "LOST";
+      msg = ":(";
     } else {
       if (this.state.win) {
-        msg = "WON";
+        msg = ":)";
       }
     }
 
     return (
       <div>
       <br/>
-      <button>{this.state.ticker}</button>
-      <button onClick={this.restartGame}>R</button>
-      <button><MsgBoard msg={msg} /></button>
+      <div>
+        <button className="bombbutton">10</button>
+        <MsgBoard
+          onClick={() => this.resetGame()}
+          msg={msg} />
+        <button className="tickerbutton">{this.state.ticker}</button>
+      </div>
+      <br/>
       <Board
         dim={this.state.dim}
         fieldmap={this.state.fieldmap}
