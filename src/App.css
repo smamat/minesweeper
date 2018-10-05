@@ -74,21 +74,17 @@
 
 
 .tickerbutton {
-  background: #fff;
-  border: 1px solid #999;
-  font-size: 32px;
-  font-weight: bold;
-  line-height: 34px;
-  height: 34px;
-  margin-left: 5px;
-  margin-top: -1px;
-  padding: 0;
-  text-align: center;
-  width: 50px;
+  font-size: 30px;
+  font-family: monospace;
+  background: black;
+  color: red;
+  border: 3px solid #999;
+  padding-right: 10px;
+  padding-left: 10px;
 }
 
 .bombbutton {
-  background: #fff;
+  /*background: #fff;
   border: 1px solid #999;
   font-size: 32px;
   font-weight: bold;
@@ -98,19 +94,19 @@
   margin-top: -1px;
   padding: 0;
   text-align: center;
-  width: 40px;
+  width: 40px;*/
 }
 
 .msgbutton {
-  background: #fee;
-  border: 1px solid #999;
-  font-size: 32px;
-  font-weight: bold;
-  line-height: 34px;
-  height: 34px;
-  margin-right: -1px;
-  margin-top: -1px;
-  padding: 0;
-  text-align: center;
-  width: 34px;
+  background: white;
+  border-top: 2px;
+  border-bottom: 2px;
+}
+
+.scoreboard {
+  padding-bottom: 10px;
+}
+
+.scoreboard button {
+  height: 50px;
 }

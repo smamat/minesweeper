@@ -36,11 +36,25 @@ function Square(props) {
 class MsgBoard extends Component {
 
   render() {
-    return (
+    /*return (
         <button
           className="msgbutton"
           onClick={this.props.onClick}>
           {this.props.msg}
+        </button>
+    );*/
+    return (
+        <button
+          className="msgbutton"
+          onClick={this.props.onClick}>
+          <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" xmlnsSvg="http://www.w3.org/2000/svg">
+            <g class="layer">
+              <circle cx="15" cy="15" fill="#ffff00" id="svg_1" r="12" stroke="#000000"/>
+              <circle cx="10" cy="10" fill="#ffff00" id="svg_2" r="1" stroke="#000000" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null"/>
+              <circle cx="20" cy="10" fill="#ffff00" id="svg_3" r="1" stroke="#000000" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null"/>
+              <ellipse cx="15" cy="20" fill="#ffffff" id="svg_4" rx="3.75" ry="4.75" stroke="#000000" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null"/>
+            </g>
+          </svg>
         </button>
     );
   }
@@ -258,14 +272,11 @@ class Game extends Component {
     return (
       <div>
       <br/>
-      <div>
+      <div class="scoreboard">
         <button className="bombbutton">10</button>
-        <MsgBoard
-          onClick={() => this.resetGame()}
-          msg={msg} />
+        <MsgBoard onClick={() => this.resetGame()} msg={msg} />
         <button className="tickerbutton">{this.state.ticker}</button>
       </div>
-      <br/>
       <Board
         dim={this.state.dim}
         fieldmap={this.state.fieldmap}
