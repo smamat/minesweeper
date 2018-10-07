@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <g class="layer">
+  <title>Layer 1</title>
+  <g id="svg_5">
+   <circle cx="15" cy="15" fill="#ffff00" id="svg_1" r="12" stroke="#000000"/>
+   <path stroke="black" stroke-width="1" fill="none" d="M9 9 l3 3 M12 9 l-3 3" />
+   <path stroke="black" stroke-width="1" fill="none" d="M19 9 l3 3 M22 9 l-3 3" />
+   <path stroke="black" stroke-width="1" fill="none" d="M10 20 Q15 13 , 20 20" />
+  </g>
+ </g>
+</svg>

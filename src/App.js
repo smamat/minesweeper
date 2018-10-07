@@ -1,60 +1,98 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
+import shockey from './shockey.svg';
+import smiley from './smiley.svg';
+import deady from './deady.svg';
+import bomb from './bomb.svg';
+import tile from './tile.svg';
+import sq1 from './sq1.svg';
+import sq2 from './sq2.svg';
+import sq3 from './sq3.svg';
+import sq4 from './sq4.svg';
+import sq5 from './sq5.svg';
+import sq6 from './sq6.svg';
+import sq7 from './sq7.svg';
+import sq8 from './sq8.svg';
 import './App.css';
-import Timer from './Timer'
 
 function Square(props) {
     var className = "square ";
 
+    var label, id = "";
     switch(props.label) {
       case 0:
+        label = "";
+        className += "open";
+        break;
       case 1:
+        label = sq1;
+        className += "open";
+        break;
       case 2:
+        label = sq2;
+        className += "open";
+        break;
       case 3:
+        label = sq3;
+        className += "open";
+        break;
       case 4:
+        label = sq4;
+        className += "open";
+        break;
       case 5:
+        label = sq5;
+        className += "open";
+        break;
       case 6:
+        label = sq6;
+        className += "open";
+        break;
       case 7:
+        label = sq7;
+        className += "open";
+        break;
       case 8:
-        className += "open ";
+        label = sq8;
+        className += "open";
         break;
       case 9:
-        className += "open bomb ";
+        label = bomb
+        className += "open ";
+        id = "bomb";
+        break;
+      case 10:
+        label = bomb;
+        id = "bomb";
+        className += "open gone "
         break;
       default:
-        className += "closed ";
+        label=tile;
     }
 
     return (
       <button className={className} onClick={props.onClick}>
-      {props.label}
+        <img src={label} alt="" id={id} />
       </button>
     );
-}
+  }
 
 //function MsgBoard(props) {
 class MsgBoard extends Component {
 
+
+  /**/
+
   render() {
-    /*return (
-        <button
-          className="msgbutton"
-          onClick={this.props.onClick}>
-          {this.props.msg}
-        </button>
-    );*/
+    const msg = this.props.msg;
+
+    var icon=shockey;
+    if (msg==="1") {icon=deady;}
+    if (msg==="2") {icon=smiley;}
+
     return (
-        <button
-          className="msgbutton"
-          onClick={this.props.onClick}>
-          <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" xmlnsSvg="http://www.w3.org/2000/svg">
-            <g class="layer">
-              <circle cx="15" cy="15" fill="#ffff00" id="svg_1" r="12" stroke="#000000"/>
-              <circle cx="10" cy="10" fill="#ffff00" id="svg_2" r="1" stroke="#000000" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null"/>
-              <circle cx="20" cy="10" fill="#ffff00" id="svg_3" r="1" stroke="#000000" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null"/>
-              <ellipse cx="15" cy="20" fill="#ffffff" id="svg_4" rx="3.75" ry="4.75" stroke="#000000" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null"/>
-            </g>
-          </svg>
+        <button className="msgbutton" onClick={this.props.onClick}>
+          <img src={icon} alt="shocked" />
         </button>
     );
   }
@@ -76,7 +114,7 @@ class Board extends Component {
       return (
         <Square key={sq}
         onClick={() => {this.props.onClick(c,r)}}
-        label={isClicked ? fieldmap[idx] : ""}
+        label={isClicked ? fieldmap[idx] : "" }
         />);
     });
 
@@ -172,19 +210,21 @@ class Game extends Component {
       return;
     }
 
-    // start stopwatch
+    // start stopwatch when first square is clicked
     if (countClickmap(clickmap) < 1) this.startTicker();
 
 
     const fieldmap = this.state.fieldmap;
 
-    // if clicked on 9-square (a bomb)
+    // if clicked 9-square (a mine), open all mines, set clicked square to 10
     if (fieldmap[idx] === 9) {
-      // open all 9-squares (bomb squares)
+      fieldmap[idx] = 10;
+      clickmap[idx] = true;
       this.setState({
         clickmap: fieldmap.map((v,i) => {
           return (v===9) ? true : clickmap[i]; }),
         exploded: true,
+        fieldmap: fieldmap,
       });
       this.stopTicker();
     } else {
@@ -259,20 +299,21 @@ class Game extends Component {
 
   render() {
 
-    var msg = ":o";
+    var msg = "0";
 
     if (this.state.exploded) {
-      msg = ":(";
+      msg = "1";
     } else {
       if (this.state.win) {
-        msg = ":)";
+        msg = "2";
       }
     }
+    //console.log("msg1: "+msg);
 
     return (
       <div>
       <br/>
-      <div class="scoreboard">
+      <div className="scoreboard">
         <button className="bombbutton">10</button>
         <MsgBoard onClick={() => this.resetGame()} msg={msg} />
         <button className="tickerbutton">{this.state.ticker}</button>
@@ -337,7 +378,6 @@ class App extends Component {
         <p className="App-intro">
           Welcome to Minesweeper
         </p>
-        <div><Timer /></div>
         <div>
           <Game dim="9" bomb="10"/>
         </div>
