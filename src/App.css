@@ -65,7 +65,7 @@
 .open img   {
   margin-left: auto;
   margin-right: auto;
-  display: block  ;
+  display: block;
   width: 50%;
 }
 
@@ -103,9 +103,12 @@
 .msgbutton {
   /*background: white;
   border-top: 2px;
-  border-bottom: 2px;*/
+  border-bottom: 2px;
   padding-top: 2px;
   padding-bottom: 7px;
+  */
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .scoreboard {

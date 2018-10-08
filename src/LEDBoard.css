@@ -1,0 +1,15 @@
+.ledboard img {
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-top: 2px;
+  height: 90%;
+}
+
+.ledboard {
+  background-color: black;
+  padding: 5px 5px 5px 5px;
+}
+
+.ledboard:focus {
+  outline: 0;
+}

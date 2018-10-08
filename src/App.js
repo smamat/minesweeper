@@ -14,88 +14,68 @@ import sq6 from './sq6.svg';
 import sq7 from './sq7.svg';
 import sq8 from './sq8.svg';
 import './App.css';
+import LEDBoard from './LEDBoard.js'
 
 function Square(props) {
-    var className = "square ";
+    var className = "square open ";
+    var sq = [sq1,sq2,sq3,sq4,sq5,sq6,sq7,sq8];
 
     var label, id = "";
     switch(props.label) {
       case 0:
         label = "";
-        className += "open";
         break;
-      case 1:
-        label = sq1;
-        className += "open";
-        break;
-      case 2:
-        label = sq2;
-        className += "open";
-        break;
-      case 3:
-        label = sq3;
-        className += "open";
-        break;
-      case 4:
-        label = sq4;
-        className += "open";
-        break;
-      case 5:
-        label = sq5;
-        className += "open";
-        break;
-      case 6:
-        label = sq6;
-        className += "open";
-        break;
-      case 7:
-        label = sq7;
-        className += "open";
-        break;
-      case 8:
-        label = sq8;
-        className += "open";
+      case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+        label = sq[props.label-1];
         break;
       case 9:
         label = bomb
-        className += "open ";
         id = "bomb";
         break;
       case 10:
         label = bomb;
         id = "bomb";
-        className += "open gone "
+        className += "gone "
         break;
       default:
-        label=tile;
+        label = tile;
+        className = "square"
+    }
+
+    // handle both left and right clicks
+    function handleClick(e) {
+      if (e.nativeEvent.which === 1) {
+        props.onClick();
+      } else if (e.nativeEvent.which === 3) {
+        e.preventDefault();
+        console.log("Right click!");
+        props.onRightClick();
+      }
     }
 
     return (
-      <button className={className} onClick={props.onClick}>
+      <button className={className} onClick={handleClick} onContextMenu={handleClick}>
         <img src={label} alt="" id={id} />
       </button>
     );
   }
 
-//function MsgBoard(props) {
-class MsgBoard extends Component {
+function MsgBoard(props) {
 
-
-  /**/
-
-  render() {
-    const msg = this.props.msg;
+  //render() {
+    //const msg = this.props.msg;
+    const msg = props.msg;
 
     var icon=shockey;
     if (msg==="1") {icon=deady;}
     if (msg==="2") {icon=smiley;}
 
     return (
-        <button className="msgbutton" onClick={this.props.onClick}>
+        <button className="msgbutton" onClick={props.onClick}>
           <img src={icon} alt="shocked" />
         </button>
     );
-  }
+  //}
 }
 
 class Board extends Component {
@@ -114,6 +94,7 @@ class Board extends Component {
       return (
         <Square key={sq}
         onClick={() => {this.props.onClick(c,r)}}
+        onRightClick={() => {this.props.onRightClick(c,r)}}
         label={isClicked ? fieldmap[idx] : "" }
         />);
     });
@@ -198,6 +179,31 @@ class Game extends Component {
     return nbomb;
   }
 
+  // flag or unflag square
+  handleRightClick(c,r) {
+    var clickmap = this.state.fieldmap;
+    const idx = this.getFieldIdx(c,r);
+
+    //- if square is open, do nothing
+    if (clickmap[idx]) {
+      console.log("square clicked: do nothing");
+      return;
+    }
+
+    var fieldmap = this.state.fieldmap;
+    // toggle set flag:
+    //  11 - flagged
+    //   0 - unclicked
+    if (fieldmap[idx] === 11) {
+      console.log("fieldmap: " + fieldmap[idx])
+      fieldmap[idx] = 0;
+    } else {
+      console.log("fieldmap: " + fieldmap[idx])
+      fieldmap[this.getFieldIdx(c,r)] = 11;
+    }
+    this.setState({fieldmap: fieldmap});
+  }
+
   handleClick(c,r) {
     const idx = this.getFieldIdx(c,r);
     const clickmap = this.state.clickmap;
@@ -212,7 +218,6 @@ class Game extends Component {
 
     // start stopwatch when first square is clicked
     if (countClickmap(clickmap) < 1) this.startTicker();
-
 
     const fieldmap = this.state.fieldmap;
 
@@ -309,20 +314,22 @@ class Game extends Component {
       }
     }
     //console.log("msg1: "+msg);
+        //<button className="tickerbutton">{this.state.ticker}</button>
 
     return (
       <div>
       <br/>
       <div className="scoreboard">
-        <button className="bombbutton">10</button>
+        <LEDBoard>3</LEDBoard>
         <MsgBoard onClick={() => this.resetGame()} msg={msg} />
-        <button className="tickerbutton">{this.state.ticker}</button>
+        <LEDBoard>{this.state.ticker}</LEDBoard>
       </div>
       <Board
         dim={this.state.dim}
         fieldmap={this.state.fieldmap}
         clickmap={this.state.clickmap}
         onClick={(c,r) => this.handleClick(c,r)}
+        onRightClick={(c,r) => this.handleRightClick(c,r)}
         />
       </div>
     );
