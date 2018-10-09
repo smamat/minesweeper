@@ -48,7 +48,6 @@ function Square(props) {
         props.onClick();
       } else if (e.nativeEvent.which === 3) {
         e.preventDefault();
-        console.log("Right click!");
         props.onRightClick();
       }
     }
@@ -181,27 +180,24 @@ class Game extends Component {
 
   // flag or unflag square
   handleRightClick(c,r) {
-    var clickmap = this.state.fieldmap;
+    var clickmap = this.state.clickmap;
     const idx = this.getFieldIdx(c,r);
 
+    console.log("rightclicked: ("+c+","+r+")")
     //- if square is open, do nothing
     if (clickmap[idx]) {
-      console.log("square clicked: do nothing");
+      console.log("square open: do nothing");
       return;
     }
+
+    console.log("square closed: do something");
 
     var fieldmap = this.state.fieldmap;
     // toggle set flag:
     //  11 - flagged
     //   0 - unclicked
-    if (fieldmap[idx] === 11) {
-      console.log("fieldmap: " + fieldmap[idx])
-      fieldmap[idx] = 0;
-    } else {
-      console.log("fieldmap: " + fieldmap[idx])
-      fieldmap[this.getFieldIdx(c,r)] = 11;
-    }
-    this.setState({fieldmap: fieldmap});
+    console.log("fieldmap("+c+","+r+"): " + fieldmap[idx]);
+
   }
 
   handleClick(c,r) {
