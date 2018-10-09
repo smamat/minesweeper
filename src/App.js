@@ -4,7 +4,9 @@ import shockey from './shockey.svg';
 import smiley from './smiley.svg';
 import deady from './deady.svg';
 import bomb from './bomb.svg';
+import falsemine from './falsemine.svg';
 import tile from './tile.svg';
+import flag from './flag.svg';
 import sq1 from './sq1.svg';
 import sq2 from './sq2.svg';
 import sq3 from './sq3.svg';
@@ -19,8 +21,12 @@ import LEDBoard from './LEDBoard.js'
 function Square(props) {
     var className = "square open ";
     var sq = [sq1,sq2,sq3,sq4,sq5,sq6,sq7,sq8];
-
     var label, id = "";
+    // 0-8: a clean field with surrounded by 0 to 8 bombs
+    //   9: a mine
+    //  10: an exploded mine
+    //  11: a flagged clean field
+    //  12: a flagged mine
     switch(props.label) {
       case 0:
         label = "";
@@ -29,17 +35,29 @@ function Square(props) {
         label = sq[props.label-1];
         break;
       case 9:
-        label = bomb
+        label = bomb;
         id = "bomb";
         break;
       case 10:
         label = bomb;
         id = "bomb";
-        className += "gone "
+        className += "gone ";
+        break;
+      case 11:
+        label = flag;
+        className = "square ";
+        break;
+      case 12:
+        label = flag;
+        className = "square ";
+        break;
+      case 13:
+        label = falsemine;
+        console.log("found 13!");
         break;
       default:
         label = tile;
-        className = "square"
+        className = "square ";
     }
 
     // handle both left and right clicks
@@ -87,14 +105,24 @@ class Board extends Component {
     const fieldmap = this.props.fieldmap;
     const clickmap = this.props.clickmap;
 
+    // if square is clicked: display empty, number or mine
+    // if square is not clicked: display tile or flag
     const col = colIdx.map((sq,c) => {
       const idx = r*dim+c;
       const isClicked = clickmap[idx];
+      var label = ""
+      if (isClicked) {
+        label = fieldmap[idx];
+      } else {
+        if (fieldmap[idx] === 11 || fieldmap[idx] === 12 || fieldmap === 13) {
+          label = fieldmap[idx];
+        }
+      }
       return (
         <Square key={sq}
         onClick={() => {this.props.onClick(c,r)}}
         onRightClick={() => {this.props.onRightClick(c,r)}}
-        label={isClicked ? fieldmap[idx] : "" }
+        label={label}
         />);
     });
 
@@ -131,6 +159,7 @@ class Game extends Component {
       nbomb: nbomb,
       fieldmap: initFieldmap(size,nbomb),
       clickmap: Array(size),
+      nflag: nbomb,
       exploded: false,
       win: false,
       ticker0: new Date(),
@@ -151,6 +180,7 @@ class Game extends Component {
       clickmap: Array(size),
       exploded: false,
       win: false,
+      nflag: nbomb,
       ticker0: new Date(),
       ticker: 0,
     });
@@ -171,7 +201,7 @@ class Game extends Component {
     for (var x=c-1; x < c+2; ++x) {
       for (var y=r-1; y < r+2; ++y) {
         var i = this.getFieldIdx(x,y);
-        if (fieldmap[i] === 9) ++nbomb;
+        if (fieldmap[i] === 9 || fieldmap[i] === 12) ++nbomb;
       }
     }
 
@@ -185,20 +215,51 @@ class Game extends Component {
 
     console.log("rightclicked: ("+c+","+r+")")
     //- if square is open, do nothing
-    if (clickmap[idx]) {
-      console.log("square open: do nothing");
+    if (clickmap[idx] || this.state.exploded || this.state.win ) {
+      console.log("square uncovered or game over: do nothing");
       return;
     }
 
-    console.log("square closed: do something");
+    console.log("square covered: do something");
 
     var fieldmap = this.state.fieldmap;
-    // toggle set flag:
-    //  11 - flagged
-    //   0 - unclicked
+    var nflag = this.state.nflag;
+    // toggle flag:
+    //   0 - covered clean field
+    //   9 - covered mine
+    //  11 - flagged clean field
+    //  12 - flagged mine
     console.log("fieldmap("+c+","+r+"): " + fieldmap[idx]);
 
+    switch(fieldmap[idx]) {
+      case 0:
+        fieldmap[idx] = 11;
+        nflag -= 1;
+        break;
+      case 9:
+        fieldmap[idx] = 12;
+        nflag -= 1;
+        break;
+      case 11:
+        fieldmap[idx] = 0;
+        nflag +=1;
+        break;
+      case 12:
+        fieldmap[idx] = 9;
+        nflag +=1;
+        break;
+      default:
+    }
+
+    //console.log("before: "+fieldmap[idx]);
+    this.setState({
+      fieldmap: fieldmap,
+      nflag: nflag,
+    });
+    //const fm = this.state.fieldmap;
+    //console.log("after: "+fm[idx]);
   }
+
 
   handleClick(c,r) {
     const idx = this.getFieldIdx(c,r);
@@ -216,6 +277,11 @@ class Game extends Component {
     if (countClickmap(clickmap) < 1) this.startTicker();
 
     const fieldmap = this.state.fieldmap;
+
+    // do nothing if square is flagged
+    if (fieldmap[idx] === 11 || fieldmap[idx] === 12) {
+      return;
+    }
 
     // if clicked 9-square (a mine), open all mines, set clicked square to 10
     if (fieldmap[idx] === 9) {
@@ -316,7 +382,7 @@ class Game extends Component {
       <div>
       <br/>
       <div className="scoreboard">
-        <LEDBoard>3</LEDBoard>
+        <LEDBoard>{this.state.nflag}</LEDBoard>
         <MsgBoard onClick={() => this.resetGame()} msg={msg} />
         <LEDBoard>{this.state.ticker}</LEDBoard>
       </div>

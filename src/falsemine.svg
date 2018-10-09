@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <g id="mine" style="fill: black; stroke: black;">
+    <circle cx="15" cy="15" id="svg_1" r="8" />
+    <path stroke-width="2" d="M15 3 L15 27" />
+    <path stroke-width="2" d="M3 15 L27 15" />
+    <g stroke="none">
+      <circle cx="8" cy="8" r="1" />
+      <circle cx="22" cy="8" r="1" />
+      <circle cx="22" cy="22" r="1" />
+      <circle cx="8" cy="22" r="1" />
+      <circle cx="12" cy="11" r="1.5" fill="white" />
+    </g>
+  </g>
+  <g id="cross" style="stroke-width:1; stroke:red;">
+    <line x1="0" y1="0" x2="30" y2="30" />
+    <line x1="30" y1="0" x2="0" y2="30" />
+  </g>
+</svg>

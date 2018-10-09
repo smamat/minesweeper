@@ -21,9 +21,12 @@ class LEDBoard extends React.Component {
       panel = [led9, led9, led9];
     }
 
+    //TODO: handle negatives
+    
     panel[0] = led[(Math.floor(number/100)%10)];
     panel[1] = led[(Math.floor(number/10)%10)];
     panel[2] = led[number%10];
+
 
     return (
       <button className="ledboard">
