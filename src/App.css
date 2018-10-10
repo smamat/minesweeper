@@ -82,39 +82,21 @@
 }
 
 /* scoreboard styles */
-.tickerbutton {
-  font-size: 30px;
-  font-family: monospace;
-  background: black;
-  color: red;
-  width: 100px;
-  margin-left: 5px;
-}
-
-.bombbutton {
-  font-size: 30px;
-  font-family: monospace;
-  background: black;
-  color: red;
-  width: 100px;
-  margin-right: 5px;
-}
-
-.msgbutton {
-  /*background: white;
-  border-top: 2px;
-  border-bottom: 2px;
-  padding-top: 2px;
-  padding-bottom: 7px;
-  */
-  padding-top: 0;
-  padding-bottom: 0;
-}
 
 .scoreboard {
   padding-bottom: 10px;
+  clear: both;
 }
 
 .scoreboard button {
   height: 45px;
+}
+
+.flagpanel {
+}
+
+.msgpanel {
+}
+
+.tickerpanel {
 }

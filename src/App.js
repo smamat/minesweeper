@@ -15,8 +15,8 @@ import sq5 from './sq5.svg';
 import sq6 from './sq6.svg';
 import sq7 from './sq7.svg';
 import sq8 from './sq8.svg';
-import './App.css';
 import LEDBoard from './LEDBoard.js'
+import './App.css';
 
 function Square(props) {
     var className = "square open ";
@@ -53,7 +53,7 @@ function Square(props) {
         break;
       case 13:
         label = falsemine;
-        console.log("found 13!");
+        id = "bomb";
         break;
       default:
         label = tile;
@@ -88,7 +88,7 @@ function MsgBoard(props) {
     if (msg==="2") {icon=smiley;}
 
     return (
-        <button className="msgbutton" onClick={props.onClick}>
+        <button onClick={props.onClick}>
           <img src={icon} alt="shocked" />
         </button>
     );
@@ -114,7 +114,7 @@ class Board extends Component {
       if (isClicked) {
         label = fieldmap[idx];
       } else {
-        if (fieldmap[idx] === 11 || fieldmap[idx] === 12 || fieldmap === 13) {
+        if (fieldmap[idx] === 11 || fieldmap[idx] === 12 || fieldmap[idx] === 13) {
           label = fieldmap[idx];
         }
       }
@@ -213,14 +213,11 @@ class Game extends Component {
     var clickmap = this.state.clickmap;
     const idx = this.getFieldIdx(c,r);
 
-    console.log("rightclicked: ("+c+","+r+")")
+    //console.log("rightclicked: ("+c+","+r+")")
     //- if square is open, do nothing
     if (clickmap[idx] || this.state.exploded || this.state.win ) {
-      console.log("square uncovered or game over: do nothing");
       return;
     }
-
-    console.log("square covered: do something");
 
     var fieldmap = this.state.fieldmap;
     var nflag = this.state.nflag;
@@ -229,7 +226,7 @@ class Game extends Component {
     //   9 - covered mine
     //  11 - flagged clean field
     //  12 - flagged mine
-    console.log("fieldmap("+c+","+r+"): " + fieldmap[idx]);
+    console.log("rightclicked "+idx+ " ("+c+","+r+"): " + fieldmap[idx]);
 
     switch(fieldmap[idx]) {
       case 0:
@@ -291,8 +288,10 @@ class Game extends Component {
         clickmap: fieldmap.map((v,i) => {
           return (v===9) ? true : clickmap[i]; }),
         exploded: true,
-        fieldmap: fieldmap,
-      });
+        fieldmap: fieldmap.map((v,i) => {
+          return (v===11) ? 13 : fieldmap[i]; }),
+        });
+
       this.stopTicker();
     } else {
     // if clicked on x-square
@@ -382,9 +381,9 @@ class Game extends Component {
       <div>
       <br/>
       <div className="scoreboard">
-        <LEDBoard>{this.state.nflag}</LEDBoard>
-        <MsgBoard onClick={() => this.resetGame()} msg={msg} />
-        <LEDBoard>{this.state.ticker}</LEDBoard>
+        <div className="flagpanel"><LEDBoard>{this.state.nflag}</LEDBoard></div>
+        <div className="msgpanel"><MsgBoard onClick={() => this.resetGame()} msg={msg} /></div>
+        <div className="tickerpanel"><LEDBoard>{this.state.ticker}</LEDBoard></div>
       </div>
       <Board
         dim={this.state.dim}
