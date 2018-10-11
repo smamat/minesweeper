@@ -41,7 +41,7 @@ function Square(props) {
       case 10:
         label = bomb;
         id = "bomb";
-        className += "gone ";
+        className += "exploded ";
         break;
       case 11:
         label = flag;
@@ -144,7 +144,7 @@ class Board extends Component {
       );
     });
 
-    return row;
+    return <div className="minefield">{row}</div>;
   }
 }
 
@@ -379,23 +379,21 @@ class Game extends Component {
 
     return (
       <div>
-      <br/>
-      <div className="scoreboard">
-        <div className="flagpanel"><LEDBoard>{this.state.nflag}</LEDBoard></div>
-        <div className="msgpanel"><MsgBoard onClick={() => this.resetGame()} msg={msg} /></div>
-        <div className="tickerpanel"><LEDBoard>{this.state.ticker}</LEDBoard></div>
-      </div>
-      <Board
-        dim={this.state.dim}
-        fieldmap={this.state.fieldmap}
-        clickmap={this.state.clickmap}
-        onClick={(c,r) => this.handleClick(c,r)}
-        onRightClick={(c,r) => this.handleRightClick(c,r)}
+        <div className="scoreboard">
+          <div className="flagpanel"><LEDBoard>{this.state.nflag}</LEDBoard></div>
+          <div className="msgpanel"><MsgBoard onClick={() => this.resetGame()} msg={msg} /></div>
+          <div className="tickerpanel"><LEDBoard>{this.state.ticker}</LEDBoard></div>
+        </div>
+        <Board
+          dim={this.state.dim}
+          fieldmap={this.state.fieldmap}
+          clickmap={this.state.clickmap}
+          onClick={(c,r) => this.handleClick(c,r)}
+          onRightClick={(c,r) => this.handleRightClick(c,r)}
         />
-      </div>
+        </div>
     );
   }
-
 } // end class Game
 
 function countClickmap(clickmap) {
@@ -446,7 +444,7 @@ class App extends Component {
         <p className="App-intro">
           Welcome to Minesweeper
         </p>
-        <div>
+        <div className="game">
           <Game dim="9" bomb="10"/>
         </div>
       </div>
