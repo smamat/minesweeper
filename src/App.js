@@ -213,7 +213,6 @@ class Game extends Component {
     var clickmap = this.state.clickmap;
     const idx = this.getFieldIdx(c,r);
 
-    //console.log("rightclicked: ("+c+","+r+")")
     //- if square is open, do nothing
     if (clickmap[idx] || this.state.exploded || this.state.win ) {
       return;
@@ -226,7 +225,6 @@ class Game extends Component {
     //   9 - covered mine
     //  11 - flagged clean field
     //  12 - flagged mine
-    console.log("rightclicked "+idx+ " ("+c+","+r+"): " + fieldmap[idx]);
 
     switch(fieldmap[idx]) {
       case 0:
@@ -248,13 +246,10 @@ class Game extends Component {
       default:
     }
 
-    //console.log("before: "+fieldmap[idx]);
     this.setState({
       fieldmap: fieldmap,
       nflag: nflag,
     });
-    //const fm = this.state.fieldmap;
-    //console.log("after: "+fm[idx]);
   }
 
 
@@ -338,7 +333,6 @@ class Game extends Component {
   }
 
   stopTicker() {
-    //console.log("stop ticker at " + this.state.ticker );
     clearInterval(this.timerID);
     this.setState({
     });
@@ -374,11 +368,9 @@ class Game extends Component {
         msg = "2";
       }
     }
-    //console.log("msg1: "+msg);
-        //<button className="tickerbutton">{this.state.ticker}</button>
 
     return (
-      <div>
+      <div className="game">
         <div className="scoreboard">
           <div className="flagpanel"><LEDBoard>{this.state.nflag}</LEDBoard></div>
           <div className="msgpanel"><MsgBoard onClick={() => this.resetGame()} msg={msg} /></div>
@@ -391,7 +383,7 @@ class Game extends Component {
           onClick={(c,r) => this.handleClick(c,r)}
           onRightClick={(c,r) => this.handleRightClick(c,r)}
         />
-        </div>
+      </div>
     );
   }
 } // end class Game
@@ -444,9 +436,7 @@ class App extends Component {
         <p className="App-intro">
           Welcome to Minesweeper
         </p>
-        <div className="game">
-          <Game dim="9" bomb="10"/>
-        </div>
+        <Game dim="9" bomb="10"/>
       </div>
     );
   }
