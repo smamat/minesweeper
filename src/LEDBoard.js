@@ -10,6 +10,7 @@ import led6 from "./led6.svg";
 import led7 from "./led7.svg";
 import led8 from "./led8.svg";
 import led9 from "./led9.svg";
+import neg from "./led-.svg";
 
 class LEDBoard extends React.Component {
   render () {
@@ -21,12 +22,20 @@ class LEDBoard extends React.Component {
       panel = [led9, led9, led9];
     }
 
-    //TODO: handle negatives
-
     panel[0] = led[(Math.floor(number/100)%10)];
     panel[1] = led[(Math.floor(number/10)%10)];
     panel[2] = led[number%10];
 
+    // handles negative numbers until 99
+    if (number < 0 ) {
+      panel[0] = neg;
+      const number2 = -number;
+      panel[1] = led[(Math.floor(number2/10)%10)];
+      panel[2] = led[(number2%10)];
+      if (number < 99) {
+        panel [neg,led9,led9];
+      }
+    }
 
     return (
       <button className="ledboard">
