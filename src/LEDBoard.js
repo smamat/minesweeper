@@ -33,7 +33,7 @@ class LEDBoard extends React.Component {
       panel[1] = led[(Math.floor(number2/10)%10)];
       panel[2] = led[(number2%10)];
       if (number < 99) {
-        panel [neg,led9,led9];
+        panel = [neg,led9,led9];
       }
     }
 
